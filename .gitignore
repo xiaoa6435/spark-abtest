@@ -1,0 +1,12 @@
+metastore_db/*
+target/*
+.bloop/*
+.bsp/*
+.idea/*
+.metals/*
+.Rhistory
+project/.bloop/*
+project/project/*
+project/target/*
+derby.log
+tmp.md

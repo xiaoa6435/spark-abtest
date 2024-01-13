@@ -1,0 +1,73 @@
+#
+# Licensed to the Apache Software Foundation (ASF) under one
+# or more contributor license agreements.  See the NOTICE file
+# distributed with this work for additional information
+# regarding copyright ownership.  The ASF licenses this file
+# to you under the Apache License, Version 2.0 (the
+# "License"); you may not use this file except in compliance
+# with the License.  You may obtain a copy of the License at
+#
+#   http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing,
+# software distributed under the License is distributed on an
+# "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+# KIND, either express or implied.  See the License for the
+# specific language governing permissions and limitations
+# under the License.
+#
+
+name: Build and test
+
+on: push
+jobs:
+  build:
+    name: CI
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        scalaVersion: [ "2.12.18", "2.13.12" ]
+        sparkVersion: [ "3.2.4", "3.3.4", "3.4.2", "3.5.0" ]
+
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install Java 8
+        uses: actions/setup-java@v4
+        with:
+          distribution: zulu
+          java-version: 8
+
+      # Cache local repositories. Note that GitHub Actions cache has a 2G limit.
+      - name: Cache Scala, SBT and Maven
+        uses: actions/cache@v3
+        with:
+          path: |
+            build/apache-maven-*
+            build/scala-*
+            build/*.jar
+            ~/.sbt
+          key: build-${{ hashFiles('**/pom.xml', 'project/build.properties', 'build/mvn', 'build/sbt', 'build/sbt-launch-lib.bash', 'build/spark-build-info') }}
+          restore-keys: |
+            build-
+
+      - name: Build with SBT
+        run: |
+          PROJECT_VERSION=$( sbt -Dsbt.supershell=false -error "print version" )
+          echo "scalaVersion: $scalaVersion, sparkVersion: $sparkVersion"
+          sbt clean test package
+        env:
+          scalaVersion: ${{ matrix.scalaVersion }}
+          sparkVersion: ${{ matrix.sparkVersion }}
+
+      - name: Check
+        run: |
+          echo "Tag name from github.ref_name: ${{  github.ref_name }}"
+          echo $( ls -al target/*/*.jar )
+      - name: Release
+        uses: softprops/action-gh-release@v1
+        if: startsWith(github.ref, 'refs/tags/')
+        with:
+          tag_name: ${{  github.ref_name }}
+          files: target/*/*.jar
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
