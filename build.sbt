@@ -17,8 +17,10 @@
 
 ThisBuild / version := "0.1.0"
 
-ThisBuild / scalaVersion := sys.env.getOrElse("scalaVersion", "2.13.12")
-val sparkVersion = sys.env.getOrElse("sparkVersion", "3.5.0")
+// ThisBuild / scalaVersion := sys.env.getOrElse("scalaVersion", "2.13.12")
+// val sparkVersion = sys.env.getOrElse("sparkVersion", "3.5.0")
+ThisBuild / scalaVersion := "2.13.12"
+val sparkVersion = "3.5.0"
 
 artifactName := { (sv: ScalaVersion, module: ModuleID, artifact: Artifact) =>
   artifact.name + "-" + module.revision + "-" + sparkVersion.self + "_" +
