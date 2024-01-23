@@ -144,19 +144,6 @@ pdf = sdf.toPandas() # local pandas dataframe
 pdf.head(5)
 ```
 
-<!--suppress HtmlUnknownAttribute -->
-<div>
-<style scoped>
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
-&#10; .dataframe tbody tr th {
-        vertical-align: top;
-    }
-&#10;    .dataframe thead th {
-        text-align: right;
-    }
-</style>
 
 |     | user_id | t   | mt  | y   | x           | y2          |
 |-----|---------|-----|-----|-----|-------------|-------------|
@@ -166,7 +153,6 @@ pdf.head(5)
 | 3   | 3       | 1.0 | t0  | 0.0 | 0.98298468  | 0.44892532  |
 | 4   | 4       | 0.0 | t1  | 0.0 | -0.83978164 | -1.26275208 |
 
-</div>
 
 ### 0/1 response: prop test/chisq test
 
@@ -176,24 +162,11 @@ pdf.head(5)
 spark.sql("select prop_test(y, t) as ret from sdf").select("ret.*").toPandas() # select("ret.*") to expand all struct fields
 ```
 
-<div>
-<style scoped>
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
-&#10;    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-&#10;    .dataframe thead th {
-        text-align: right;
-    }
-</style>
 
 |     | estimate                                     | pvalue     | lower       | upper      | chisq      |
 |-----|----------------------------------------------|------------|-------------|------------|------------|
 | 0   | \[0.09937538912654897, 0.10111732956242904\] | 0.36465656 | -0.00200086 | 0.00548474 | 0.82179266 |
 
-</div>
 
 ``` python
 import pandas as pd
@@ -218,24 +191,11 @@ function in R) and mean response ratio for each treat.
 spark.sql("select prop_test(y, factor(mt, array('t0', 't1', 't2'))) as ret from sdf").select("ret.*").toPandas() # select("ret.*") to expand all struct fields
 ```
 
-<div>
-<style scoped>
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
-&#10;    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-&#10;    .dataframe thead th {
-        text-align: right;
-    }
-</style>
 
 |     | estimate                                           | pvalue     | lower | upper | chisq      |
 |-----|----------------------------------------------------|------------|-------|-------|------------|
 | 0   | \[0.10143841774048547, 0.10020523100420008, 0.0... | 0.38456362 | NaN   | NaN   | 1.91129209 |
 
-</div>
 
 ``` python
 observed = pd.crosstab(pdf['y'], pdf['mt'])
@@ -253,24 +213,11 @@ chi2, p, dof, expected = chi2_contingency(observed)
 spark.sql("select ttest(y2, t) as ret from sdf").select("ret.*").toPandas() # select("ret.*") to expand all struct fields
 ```
 
-<div>
-<style scoped>
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
-&#10;    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-&#10;    .dataframe thead th {
-        text-align: right;
-    }
-</style>
 
 |     | delta       | stderr     | tvalue      | pvalue     | lower       | upper      | y0          | y1          |
 |-----|-------------|------------|-------------|------------|-------------|------------|-------------|-------------|
 | 0   | -0.00240728 | 0.00683655 | -0.35211824 | 0.72475033 | -0.01580684 | 0.01099229 | -0.00010504 | -0.00251232 |
 
-</div>
 
 ``` python
 from scipy import stats
@@ -291,24 +238,11 @@ f"tvalue: {ret.statistic:.6f}, pvalue: {ret.pvalue:.6f}, lower: {ci.low:.6f}, up
 spark.sql("select ttest(y2, t, 0.95, 'two-sided', true) as ret from sdf").select("ret.*").toPandas() # select("ret.*") to expand all struct fields
 ```
 
-<div>
-<style scoped>
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
-&#10;    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-&#10;    .dataframe thead th {
-        text-align: right;
-    }
-</style>
 
 |     | delta       | stderr     | tvalue      | pvalue     | lower       | upper      | y0          | y1          |
 |-----|-------------|------------|-------------|------------|-------------|------------|-------------|-------------|
 | 0   | -0.00240728 | 0.00683657 | -0.35211763 | 0.72475079 | -0.01580686 | 0.01099231 | -0.00010504 | -0.00251232 |
 
-</div>
 
 this actually equal to `anova` or `ols`
 
@@ -316,48 +250,22 @@ this actually equal to `anova` or `ols`
 spark.sql("select anova(y2, t) as ret from sdf").select("ret.*").toPandas() # inline expand array of struct
 ```
 
-<div>
-<style scoped>
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
-&#10;    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-&#10;    .dataframe thead th {
-        text-align: right;
-    }
-</style>
 
 |     | delta       | stderr     | tvalue      | pvalue     | lower       | upper      | my0         | my          |
 |-----|-------------|------------|-------------|------------|-------------|------------|-------------|-------------|
 | 0   | -0.00240728 | 0.00683657 | -0.35211763 | 0.72475079 | -0.01580686 | 0.01099231 | -0.00010504 | -0.00251232 |
 
-</div>
 
 ``` python
 spark.sql("select inline(ols(y2, array(1.0, t))) from sdf").toPandas()
 ```
 
-<div>
-<style scoped>
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
-&#10;    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-&#10;    .dataframe thead th {
-        text-align: right;
-    }
-</style>
 
 |     | delta       | stderr     | tvalue      | pvalue     | lower       | upper      |
 |-----|-------------|------------|-------------|------------|-------------|------------|
 | 0   | -0.00010504 | 0.00484427 | -0.02168431 | 0.98269982 | -0.00959976 | 0.00938967 |
 | 1   | -0.00240728 | 0.00683657 | -0.35211763 | 0.72475079 | -0.01580686 | 0.01099231 |
 
-</div>
 
 ##### python scipy.stat
 
@@ -391,29 +299,11 @@ select ttest(y2_rank, t).pvalue as mannwhitneyu_pvalue
 
     0.6348526173470306
 
-    24/01/23 19:43:44 WARN WindowExec: No Partition Defined for Window operation! Moving all data to a single partition, this can cause serious performance degradation.
-    24/01/23 19:43:44 WARN WindowExec: No Partition Defined for Window operation! Moving all data to a single partition, this can cause serious performance degradation.
-    24/01/23 19:43:44 WARN WindowExec: No Partition Defined for Window operation! Moving all data to a single partition, this can cause serious performance degradation.
-    24/01/23 19:43:44 WARN WindowExec: No Partition Defined for Window operation! Moving all data to a single partition, this can cause serious performance degradation.
-
-<div>
-<style scoped>
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
-&#10;    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-&#10;    .dataframe thead th {
-        text-align: right;
-    }
-</style>
 
 |     | mannwhitneyu_pvalue |
 |-----|---------------------|
 | 0   | 0.63485152          |
 
-</div>
 
 #### multi arm: anova
 
@@ -424,18 +314,6 @@ spark-abtest, use anova instead
 spark.sql("select inline(anova(y2, factor(mt, array('t0', 't1', 't2')))) from sdf").toPandas() # inline expand array of struct
 ```
 
-<div>
-<style scoped>
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
-&#10;    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-&#10;    .dataframe thead th {
-        text-align: right;
-    }
-</style>
 
 |     | delta       | stderr     | tvalue      | pvalue     | lower       | upper      | my          |
 |-----|-------------|------------|-------------|------------|-------------|------------|-------------|
@@ -443,7 +321,6 @@ spark.sql("select inline(anova(y2, factor(mt, array('t0', 't1', 't2')))) from sd
 | 1   | 0.00752212  | 0.00755395 | 0.99578717  | 0.31935597 | -0.00728352 | 0.02232777 | 0.00431329  |
 | 2   | -0.00696294 | 0.00969043 | -0.71853771 | 0.47242748 | -0.02595606 | 0.01203018 | -0.01017177 |
 
-</div>
 
 ``` python
 import statsmodels.api as sm
@@ -466,93 +343,41 @@ pd.set_option('display.float_format', lambda x: f'{x:,.8f}')
 spark.sql("select ttest(y2, t) as ret from sdf").select("ret.*").toPandas() # select("ret.*") to expand all struct fields
 ```
 
-<div>
-<style scoped>
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
-&#10;    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-&#10;    .dataframe thead th {
-        text-align: right;
-    }
-</style>
 
 |     | delta       | stderr     | tvalue      | pvalue     | lower       | upper      | y0          | y1          |
 |-----|-------------|------------|-------------|------------|-------------|------------|-------------|-------------|
 | 0   | -0.00240728 | 0.00683655 | -0.35211824 | 0.72475033 | -0.01580684 | 0.01099229 | -0.00010504 | -0.00251232 |
 
-</div>
 
 ``` python
 spark.sql("select cuped(y2, t, x) as ret from sdf").select("ret.*").toPandas() # select("ret.*") to expand all struct fields
 ```
 
-<div>
-<style scoped>
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
-&#10;    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-&#10;    .dataframe thead th {
-        text-align: right;
-    }
-</style>
 
 |     | delta       | stderr     | tvalue      | pvalue     | lower       | upper      | y0          | y1          | x0         | x1         | theta      |
 |-----|-------------|------------|-------------|------------|-------------|------------|-------------|-------------|------------|------------|------------|
 | 0   | -0.00250543 | 0.00633984 | -0.39518820 | 0.69270484 | -0.01493143 | 0.00992058 | -0.00010504 | -0.00251232 | 0.00021016 | 0.00045288 | 0.40439612 |
 
-</div>
 
 ``` python
 spark.sql("select ancova1(y2, t, x) as ret from sdf").select("ret.*").toPandas() # select("ret.*") to expand all struct fields
 ```
 
-<div>
-<style scoped>
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
-&#10;    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-&#10;    .dataframe thead th {
-        text-align: right;
-    }
-</style>
 
 |     | delta       | stderr     | tvalue      | pvalue     | lower       | upper      | my0         | my          | mx0        | mx         |
 |-----|-------------|------------|-------------|------------|-------------|------------|-------------|-------------|------------|------------|
 | 0   | -0.00250543 | 0.00633990 | -0.39518449 | 0.69270758 | -0.01493155 | 0.00992069 | -0.00010504 | -0.00251232 | 0.00021016 | 0.00045288 |
 
-</div>
 
 ``` python
 spark.sql("select ancova2(y2, t, x) as ret from sdf").select("ret.*").toPandas() # select("ret.*") to expand all struct fields
 ```
 
-<div>
-<style scoped>
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
-&#10;    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-&#10;    .dataframe thead th {
-        text-align: right;
-    }
-</style>
 
 |     | delta       | stderr     | tvalue      | pvalue     | lower       | upper      | my0         | my          | mx0        | mx         |
 |-----|-------------|------------|-------------|------------|-------------|------------|-------------|-------------|------------|------------|
 | 0   | -0.00250543 | 0.00633993 | -0.39518271 | 0.69270890 | -0.01493161 | 0.00992075 | -0.00010504 | -0.00251232 | 0.00021016 | 0.00045288 |
 
-</div>
 
 ## randomization unit \> analysis unit: delta method or cluster-robust standard error
 
@@ -613,18 +438,6 @@ scdf.createOrReplaceTempView("scdf")
 pcdf.head(5)
 ```
 
-<div>
-<style scoped>
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
-&#10;    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-&#10;    .dataframe thead th {
-        text-align: right;
-    }
-</style>
 
 |     | user_id | visit_id | t          | mt  | y          | x           | y2          |
 |-----|---------|----------|------------|-----|------------|-------------|-------------|
@@ -634,7 +447,6 @@ pcdf.head(5)
 | 3   | 0       | 3        | 0.00000000 | t0  | 1.00000000 | -1.97814922 | -1.20993685 |
 | 4   | 0       | 4        | 0.00000000 | t0  | 1.00000000 | -2.32212300 | -1.17054778 |
 
-</div>
 
 ### 0/1 or continuous response: cluster_ttest
 
@@ -642,24 +454,11 @@ pcdf.head(5)
 spark.sql("select cluster_ttest(y2, t, user_id) as ret from scdf").select("ret.*").toPandas()
 ```
 
-<div>
-<style scoped>
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
-&#10;    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-&#10;    .dataframe thead th {
-        text-align: right;
-    }
-</style>
 
 |     | delta      | stderr     | tvalue     | pvalue     | lower       | upper      | my0         | my          |
 |-----|------------|------------|------------|------------|-------------|------------|-------------|-------------|
 | 0   | 0.01441253 | 0.07627543 | 0.18895374 | 0.85013291 | -0.13510268 | 0.16392773 | -0.03379021 | -0.01937769 |
 
-</div>
 
 #### delta method with variance reduction
 
@@ -667,47 +466,21 @@ spark.sql("select cluster_ttest(y2, t, user_id) as ret from scdf").select("ret.*
 spark.sql("select cluster_ancova1(y2, t, x, user_id) as ret from scdf").select("ret.*").toPandas()
 ```
 
-<div>
-<style scoped>
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
-&#10;    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-&#10;    .dataframe thead th {
-        text-align: right;
-    }
-</style>
 
 |     | delta      | stderr     | tvalue     | pvalue     | lower       | upper      | my0         | my          | mx0         | mx          |
 |-----|------------|------------|------------|------------|-------------|------------|-------------|-------------|-------------|-------------|
 | 0   | 0.00309024 | 0.07224579 | 0.04277391 | 0.96588261 | -0.13852608 | 0.14470655 | -0.03379021 | -0.01937769 | -0.06156514 | -0.01019905 |
 
-</div>
 
 ``` python
 spark.sql("select cluster_ancova2(y2, t, x, user_id) as ret from scdf").select("ret.*").toPandas()
 ```
 
-<div>
-<style scoped>
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
-&#10;    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-&#10;    .dataframe thead th {
-        text-align: right;
-    }
-</style>
 
 |     | delta      | stderr     | tvalue     | pvalue     | lower       | upper      | my0         | my          | mx0         | mx          |
 |-----|------------|------------|------------|------------|-------------|------------|-------------|-------------|-------------|-------------|
 | 0   | 0.00312417 | 0.07226738 | 0.04323066 | 0.96551853 | -0.13853445 | 0.14478279 | -0.03379021 | -0.01937769 | -0.06156514 | -0.01019905 |
 
-</div>
 
 ### ols/cluster_ols
 
@@ -715,18 +488,6 @@ spark.sql("select cluster_ancova2(y2, t, x, user_id) as ret from scdf").select("
 spark.sql("select inline(ols(y2, array(1.0, t, x, t * x))) from scdf").toPandas()
 ```
 
-<div>
-<style scoped>
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
-&#10;    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-&#10;    .dataframe thead th {
-        text-align: right;
-    }
-</style>
 
 |     | delta       | stderr     | tvalue      | pvalue     | lower       | upper      |
 |-----|-------------|------------|-------------|------------|-------------|------------|
@@ -735,7 +496,6 @@ spark.sql("select inline(ols(y2, array(1.0, t, x, t * x))) from scdf").toPandas(
 | 2   | 0.22544998  | 0.01383548 | 16.29505891 | 0.00000000 | 0.19832965  | 0.25257031 |
 | 3   | -0.01093015 | 0.02040205 | -0.53573755 | 0.59215188 | -0.05092228 | 0.02906199 |
 
-</div>
 
 ``` python
 import statsmodels.api as sm
@@ -745,19 +505,6 @@ ret = smf.ols(formula='y2 ~ t * x', data=pcdf).fit().summary().tables[1]
 pd.DataFrame(ret)
 ```
 
-<div>
-<style scoped>
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
-&#10;    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-&#10;    .dataframe thead th {
-        text-align: right;
-    }
-</style>
-
 |     | 0         | 1       | 2       | 3      | 4        | 5       | 6       |
 |-----|-----------|---------|---------|--------|----------|---------|---------|
 | 0   |           | coef    | std err | t      | P\>\|t\| | \[0.025 | 0.975\] |
@@ -766,24 +513,11 @@ pd.DataFrame(ret)
 | 3   | x         | 0.2254  | 0.014   | 16.295 | 0.000    | 0.198   | 0.253   |
 | 4   | t:x       | -0.0109 | 0.020   | -0.536 | 0.592    | -0.051  | 0.029   |
 
-</div>
 
 ``` python
 spark.sql("select inline(cluster_ols(y2, array(1.0, t, x, t * x), user_id)) from scdf").toPandas()
 ```
 
-<div>
-<style scoped>
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
-&#10;    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-&#10;    .dataframe thead th {
-        text-align: right;
-    }
-</style>
 
 |     | delta       | stderr     | tvalue      | pvalue     | lower       | upper      |
 |-----|-------------|------------|-------------|------------|-------------|------------|
@@ -792,7 +526,6 @@ spark.sql("select inline(cluster_ols(y2, array(1.0, t, x, t * x), user_id)) from
 | 2   | 0.22544998  | 0.03126138 | 7.21177413  | 0.00000000 | 0.16417138  | 0.28672857 |
 | 3   | -0.01093015 | 0.04018747 | -0.27197896 | 0.78564382 | -0.08970569 | 0.06784539 |
 
-</div>
 
 ``` python
 import statsmodels.api as sm
@@ -803,19 +536,6 @@ ret = fit.get_robustcov_results(cov_type='cluster', groups=pcdf['user_id']).summ
 pd.DataFrame(ret)
 ```
 
-<div>
-<style scoped>
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
-&#10;    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-&#10;    .dataframe thead th {
-        text-align: right;
-    }
-</style>
-
 |     | 0         | 1       | 2       | 3      | 4        | 5       | 6       |
 |-----|-----------|---------|---------|--------|----------|---------|---------|
 | 0   |           | coef    | std err | t      | P\>\|t\| | \[0.025 | 0.975\] |
@@ -824,7 +544,6 @@ pd.DataFrame(ret)
 | 3   | x         | 0.2254  | 0.031   | 7.212  | 0.000    | 0.164   | 0.287   |
 | 4   | t:x       | -0.0109 | 0.040   | -0.272 | 0.786    | -0.090  | 0.068   |
 
-</div>
 
 
 
