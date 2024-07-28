@@ -2,7 +2,7 @@
 
 # spark-abtest
 
-spark-abtest provides a series of concise, performant and useful functions for data scientist/analyst to analysis A/B TEST(abtest) on Apache Spark.
+Analyzing A/B testing with massive data can be tedious: you need to understand the details of the formulas for various statistical tests, and get the required sufficient statistics on a distributed computing cluster, then pull the sufficient statistics locally and manually calculate the final results. This project provides a series of concise, consistent and high-performance functions to make it easier for data scientists/data analysts to analyze A/B testing in Apache Spark.
 
 CI: [![GitHub Build Status](https://github.com/xiaoa6435/spark-abtest/actions/workflows/build_and_test.yml/badge.svg)](https://github.com/xiaoa6435/spark-abtest/actions/workflows/build_and_test.yml)
 
@@ -25,88 +25,6 @@ for example, in spark-shell
       --conf spark.jars=target/scala-2.12/spark-abtest-0.1.0-3.5.0_2.12.jar \
       --conf spark.sql.extensions=org.apache.spark.sql.extra.AbtestExtensions
 
-# all functions
-
-- prop_test(y, t, confLevel = 0.95, alternative = ‘two-sided’, varEqual
-  = false, removeNaN = true, correct = true)
-
-- ttest(y, t, confLevel = 0.95, alternative = ‘two-sided’, varEqual =
-  false, removeNaN = true)
-
-- cuped(y, t, x, confLevel = 0.95, alternative = ‘two-sided’, varEqual =
-  false, removeNaN = true)
-
-- ols(y, X, confLevel = 0.95, stdErrorType = ‘const’, removeNaN = true)
-
-- anova(y, t, confLevel = 0.95, stdErrorType = ‘const’, removeNaN =
-  true)
-
-- ancova1(y, t, confLevel = 0.95, stdErrorType = ‘const’, removeNaN =
-  true)
-
-- ancova2(y, t, confLevel = 0.95, stdErrorType = ‘const’, removeNaN =
-  true)
-
-- cluster_ols(y, X, cid, confLevel = 0.95, stdErrorType = ‘HC1’,
-  removeNaN = true)
-
-- cluster_anova(y, t, x, cid, confLevel = 0.95, stdErrorType = ‘HC1’,
-  removeNaN = true)
-
-- cluster_ancova1(y, t, x, cid, confLevel = 0.95, stdErrorType = ‘HC1’,
-  removeNaN = true)
-
-- cluster_ancova2(y, t, x, cid, confLevel = 0.95, stdErrorType = ‘HC1’,
-  removeNaN = true)
-
-- avg_rank(): like rank(), but return average rank rather than min rank
-  when ties
-
-except avg_rank(window rank), all functions are aggregate functions.
-
-## input
-
-- y: metrics variable, double type, prop_test also accept boolean
-  metrics col
-- t: treat variable
-    - two arms (A/B test): numeric type of 0/1, or boolean type
-    - multi arm(A/B/C… test):
-        - wrapped by `factor(t, array('t0', 't1', 't2'))`, the array is
-          different values of t
-        - the first is base group
-        - ttest does’t accept multi treatment
-- x: control variable, double type
-- confLevel: confidence level of the interval, default value is 0.95
-- alternative: a character string specifying the alternative hypothesis,
-  must be one of “two.sided” (default), “greater” or “less”.
-  You can specify just the initial letter.
-- varEqual: is used to estimate the variance otherwise the Welch (or
-  Satterthwaite) approximation to the degrees of freedom is used
-- removeNaN: if true, any of y/t/x contains nan, the corresponding row will be
-  removed, like na.action = ‘omit’
-- stdErrorType: a character string specifying the estimation type, for
-  ols/anova/ancova1/ancova2, default is const, for
-  cluster_ols/anova/ancova1/ancova2, default is HC1
-
-## output
-
-- two arms (A/B test): return a struct with some fields:
-    - delta: the estimated difference in means of y
-    - stderr: the standard error of the mean (difference), used as
-      denominator in the t-statistic formula
-    - tvalue: the value of the t-statistic, equal to delta / tvalue
-    - pvalue: the p-value for the test
-    - lower: lower confidence limits for delta
-    - upper upper confidence limits for delta
-    - y0: mean of y in the treat group (t = 0)
-    - y1: mean of y in the control group (t = 1)
-    - x0: mean of x in the treat groups (t = 0)
-    - x1: mean of x in the treat group (t = 0)
-    - theta: for cuped only
-    - my: mean of y in the corresponding treat group
-    - mx: mean of x in the corresponding treat group
-- multi arm (A/B/C… test): return an array of struct for each treat
-
 # example
 
 ## init
@@ -116,9 +34,9 @@ from pyspark.sql import SparkSession
 
 spark = (
     SparkSession.builder
-    .config("spark.jars", "spark-abtest-0.1.0-3.5.0_2.12.jar")
-    .config("spark.sql.extensions", "org.apache.spark.sql.extra.AbtestExtensions")
-    .getOrCreate()
+        .config("spark.jars", "spark-abtest-0.1.0-3.5.0_2.12.jar")
+        .config("spark.sql.extensions", "org.apache.spark.sql.extra.AbtestExtensions")
+        .getOrCreate()
 )
 ```
 
@@ -545,6 +463,88 @@ pd.DataFrame(ret)
 | 4   | t:x       | -0.0109 | 0.040   | -0.272 | 0.786    | -0.090  | 0.068   |
 
 
+
+# all functions
+
+- prop_test(y, t, confLevel = 0.95, alternative = ‘two-sided’, varEqual
+  = false, removeNaN = true, correct = true)
+
+- ttest(y, t, confLevel = 0.95, alternative = ‘two-sided’, varEqual =
+  false, removeNaN = true)
+
+- cuped(y, t, x, confLevel = 0.95, alternative = ‘two-sided’, varEqual =
+  false, removeNaN = true)
+
+- ols(y, X, confLevel = 0.95, stdErrorType = ‘const’, removeNaN = true)
+
+- anova(y, t, confLevel = 0.95, stdErrorType = ‘const’, removeNaN =
+  true)
+
+- ancova1(y, t, confLevel = 0.95, stdErrorType = ‘const’, removeNaN =
+  true)
+
+- ancova2(y, t, confLevel = 0.95, stdErrorType = ‘const’, removeNaN =
+  true)
+
+- cluster_ols(y, X, cid, confLevel = 0.95, stdErrorType = ‘HC1’,
+  removeNaN = true)
+
+- cluster_anova(y, t, x, cid, confLevel = 0.95, stdErrorType = ‘HC1’,
+  removeNaN = true)
+
+- cluster_ancova1(y, t, x, cid, confLevel = 0.95, stdErrorType = ‘HC1’,
+  removeNaN = true)
+
+- cluster_ancova2(y, t, x, cid, confLevel = 0.95, stdErrorType = ‘HC1’,
+  removeNaN = true)
+
+- avg_rank(): like rank(), but return average rank rather than min rank
+  when ties
+
+except avg_rank(window rank), all functions are aggregate functions.
+
+## input
+
+- y: metrics variable, double type, prop_test also accept boolean
+  metrics col
+- t: treat variable
+    - two arms (A/B test): numeric type of 0/1, or boolean type
+    - multi arm(A/B/C… test):
+        - wrapped by `factor(t, array('t0', 't1', 't2'))`, the array is
+          different values of t
+        - the first is base group
+        - ttest does’t accept multi treatment
+- x: control variable, double type
+- confLevel: confidence level of the interval, default value is 0.95
+- alternative: a character string specifying the alternative hypothesis,
+  must be one of “two.sided” (default), “greater” or “less”.
+  You can specify just the initial letter.
+- varEqual: is used to estimate the variance otherwise the Welch (or
+  Satterthwaite) approximation to the degrees of freedom is used
+- removeNaN: if true, any of y/t/x contains nan, the corresponding row will be
+  removed, like na.action = ‘omit’
+- stdErrorType: a character string specifying the estimation type, for
+  ols/anova/ancova1/ancova2, default is const, for
+  cluster_ols/anova/ancova1/ancova2, default is HC1
+
+## output
+
+- two arms (A/B test): return a struct with some fields:
+    - delta: the estimated difference in means of y
+    - stderr: the standard error of the mean (difference), used as
+      denominator in the t-statistic formula
+    - tvalue: the value of the t-statistic, equal to delta / tvalue
+    - pvalue: the p-value for the test
+    - lower: lower confidence limits for delta
+    - upper upper confidence limits for delta
+    - y0: mean of y in the treat group (t = 0)
+    - y1: mean of y in the control group (t = 1)
+    - x0: mean of x in the treat groups (t = 0)
+    - x1: mean of x in the treat group (t = 0)
+    - theta: for cuped only
+    - my: mean of y in the corresponding treat group
+    - mx: mean of x in the corresponding treat group
+- multi arm (A/B/C… test): return an array of struct for each treat
 
 
 
